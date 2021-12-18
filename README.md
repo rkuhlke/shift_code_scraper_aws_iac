@@ -1,2 +1,2 @@
-# shift_code_scraper_aws_iac
-Terraform IAC for the Shift Code Scraper Repository
+# Shift Code Scraper IAC
+AWS Terraform IAC for the Shift Code Scraper Repository
