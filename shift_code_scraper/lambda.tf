@@ -1,8 +1,5 @@
 resource "aws_lambda_function" "lambda_function" {
   function_name = format("%s-%s-%s-lambda", var.environment, var.project, var.application)
-  depends_on = [
-    aws_ecr_repository.ecr_repository
-  ]
 
   environment {
     variables = {
