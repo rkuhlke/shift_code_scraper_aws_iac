@@ -51,6 +51,21 @@ data "aws_iam_policy_document" "trustrelationship" {
     }
   }
 }
+
+data "aws_iam_policy_document" "logging_policy" {
+  statement {
+    sid = "LambdaLoggingPolicy"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      "${aws_cloudwatch_log_group.lambda_log_group.arn}:*"
+    ]
+  }
+}
+
 ###################### IAM ######################
 
 ################ Secrets Manager ################
@@ -58,4 +73,5 @@ data "aws_iam_policy_document" "trustrelationship" {
 data "aws_secretsmanager_secret" "secret" {
   name = var.secertName
 }
+
 ################ Secrets Manager ################

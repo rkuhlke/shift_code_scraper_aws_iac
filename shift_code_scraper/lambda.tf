@@ -16,17 +16,3 @@ resource "aws_lambda_function" "lambda_function" {
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
   name = "/aws/lambda/${aws_lambda_function.lambda_function.function_name}"
 }
-
-data "aws_iam_policy_document" "logging_policy" {
-  statement {
-    sid = "LambdaLoggingPolicy"
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
-    ]
-    resources = [
-      "${aws_cloudwatch_log_group.lambda_log_group.arn}:*"
-    ]
-  }
-}
