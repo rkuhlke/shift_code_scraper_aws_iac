@@ -33,6 +33,7 @@ module "shift_code_scraper" {
 
 
 #################### Valheim Server ####################
+# Comment out when not in use
 module "ecs_hosted_valheim_server" {
   source                = "./valheim_server"
   environment           = var.environment
