@@ -64,8 +64,56 @@ resource "aws_route_table_association" "public-subnet-association" {
 }
 
 resource "aws_flow_log" "s3_flow_logs" {
-  log_destination      = aws_s3_bucket.s3_vpc_logs.arn
-  log_destination_type = "s3"
+  iam_role_arn         = aws_iam_role.vpc_iam_role.arn
+  log_destination      = aws_cloudwatch_log_group.vpc_flow_logs.arn
   traffic_type         = "ALL"
   vpc_id               = aws_vpc.main_vpc.id
+}
+
+resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
+  name = format("%s-%s-vpc-flow-logs", var.environment, var.vpc_name)
+}
+
+resource "aws_iam_role" "vpc_iam_role" {
+  name = format("%s-%s-vpc-flow-logs-role", var.environment, var.vpc_name)
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "vpc-flow-logs.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "example" {
+  name = format("%s-%s-vpc-flow-logs-policy", var.environment, var.vpc_name)
+  role = aws_iam_role.vpc_iam_role.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
 }
