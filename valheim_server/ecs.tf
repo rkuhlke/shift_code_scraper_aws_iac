@@ -27,21 +27,58 @@ resource "aws_ecs_capacity_provider" "capacity-provider" {
 }
 
 resource "aws_ecs_task_definition" "task_definition" {
-  family        = format("%s-%s-%s-task", var.project, var.environment, var.application)
-  task_role_arn = aws_iam_role.ecs_task_role.arn
+  depends_on = [
+    aws_ecr_repository.ecr_repo,
+    aws_iam_role.ecs_task_execution_role
+  ]
+  family             = format("%s-%s-%s-task", var.project, var.environment, var.application)
+  task_role_arn      = aws_iam_role.ecs_task_role.arn
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+
+  volume {
+    name = "efs"
+    efs_volume_configuration {
+      file_system_id     = aws_efs_file_system.efs.id
+      root_directory     = "/"
+      transit_encryption = "ENABLED"
+      authorization_config {
+        iam = "ENABLED"
+        access_point_id = aws_efs_access_point.efs_access_point.id
+      }
+    }
+  }
   container_definitions = jsonencode([
     {
-      name      = "${var.application}"
-      image     = "${aws_ecr_repository.ecr_repo.repository_url}:latest"
-      cpu       = 1024
-      memory    = 3072
-      essential = true
+      name         = "${var.application}"
+      image        = "${aws_ecr_repository.ecr_repo.repository_url}:latest"
+      cpu          = 2048
+      memory       = 4096
+      essential    = true
       network_mode = "host"
-      volume = {
-        name = "valheim-artifacts"
-        host_path = "/home/ec2-user/worlds"
-      }
-      portMappings = [
+      secrets = [
+        {
+          name      = "serverName"
+          valueFrom = "${aws_secretsmanager_secret.server.arn}"
+        },
+        {
+          name      = "worldName"
+          valueFrom = "${aws_secretsmanager_secret.world.arn}"
+        },
+        {
+          name      = "serverPassword"
+          valueFrom = "${aws_secretsmanager_secret.password.arn}"
+        }
+      ]
+
+      "mountPoints" : [
+        {
+          "containerPath" : "/home/steam/valheim/worlds",
+          "sourceVolume" : "efs",
+          "readOnly" : false
+        }
+      ]
+
+      "portMappings" = [
         {
           containerPort = 2456
           hostPort      = 2456

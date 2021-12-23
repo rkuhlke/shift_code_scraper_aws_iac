@@ -5,7 +5,7 @@ resource "aws_launch_template" "ec2-launch-template" {
   instance_type          = var.instance_type
   user_data              = base64encode(data.template_file.user_data_file.rendered)
   key_name               = var.key_name
-  vpc_security_group_ids = [aws_security_group.sg.id]
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
   lifecycle {
     create_before_destroy = true
@@ -19,8 +19,9 @@ resource "aws_launch_template" "ec2-launch-template" {
     device_name = "/dev/xvda"
     ebs {
       volume_size = 500
-      volume_type = "io2"
+      volume_type = "gp3"
       iops        = 2500
+      encrypted   = true
     }
   }
 
@@ -43,21 +44,26 @@ resource "aws_launch_template" "ec2-launch-template" {
 }
 
 resource "aws_autoscaling_group" "asg" {
+  depends_on = [
+    aws_efs_file_system.efs,
+    aws_efs_mount_target.efs_mount_target,
+    aws_security_group.ec2_sg,
+    aws_security_group.efs_sg
+  ]
   name                      = format("%s-%s-%s-asg", var.project, var.environment, var.application)
   min_size                  = var.min_size
   max_size                  = var.max_size
-  desired_capacity          = var.desired_capacity
   health_check_grace_period = 200
   force_delete              = true
   default_cooldown          = 0
   health_check_type         = "EC2"
   protect_from_scale_in     = true
 
-  vpc_zone_identifier = [data.aws_subnet.selected.id]
+  vpc_zone_identifier = [data.aws_subnet.public_subnet.id]
   suspended_processes = ["ReplaceUnhealthy"]
 
   launch_template {
-    id      = aws_launch_template.ec2-launch-template.id
+    id = aws_launch_template.ec2-launch-template.id
   }
 
   lifecycle {

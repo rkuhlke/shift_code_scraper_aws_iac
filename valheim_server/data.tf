@@ -10,8 +10,11 @@ data "aws_iam_policy_document" "iam-policy" {
       "secretsmanager:DescribeSecret",
       "secretsmanager:ListSecrets"
     ]
-
-    resources = [format("arn:aws:secretsmanager:%s:%s:secret:%s/%s/%s", var.aws_region, var.account_id, var.project, var.environment, var.application)]
+    resources = [
+      aws_secretsmanager_secret.server.arn,
+      aws_secretsmanager_secret.world.arn,
+      aws_secretsmanager_secret.password.arn
+    ]
   }
   statement {
     sid = "ValheimServerECRAccess"
@@ -30,14 +33,6 @@ data "aws_iam_policy_document" "iam-policy" {
   }
 
   statement {
-    sid = "ValheimServerECRAuthorizer"
-    actions = [
-      "ecr:GetAcuthorizationToken"
-    ]
-    resources = ["*"]
-  }
-
-  statement {
     sid = "S3Access"
     actions = [
       "s3:GetObject",
@@ -46,7 +41,20 @@ data "aws_iam_policy_document" "iam-policy" {
     resources = [
       data.aws_s3_bucket.selected.arn,
       "${data.aws_s3_bucket.selected.arn}/*"
-      ]
+    ]
+  }
+
+  statement {
+    sid = "EC2Access"
+    actions = [
+      "ec2:DescribeAvailabilityZones",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeVpcs",
+      "ec2:DescribeVpcAttribute"
+    ]
+    resources = [
+      "*"
+    ]
   }
 }
 
@@ -77,23 +85,38 @@ data "aws_iam_policy_document" "ecs-trustrelationship" {
     }
   }
 }
+
+data "aws_iam_policy_document" "ecs_policy" {
+  statement {
+    sid = "ValheimServerSecretAccess"
+
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecrets"
+    ]
+
+    resources = [
+      aws_secretsmanager_secret.server.arn,
+      aws_secretsmanager_secret.world.arn,
+      aws_secretsmanager_secret.password.arn
+    ]
+  }
+
+  statement {
+    sid = "AllowEFSMountWrite"
+    actions = [
+      "elasticfilesystem:*"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
 ################### ECS ###################
 
 ########################## IAM ##########################
-
-
-################# Secrets Manager #################
-
-data "aws_secretsmanager_secret" "valheim-server-secret" {
-  name = format("%s/%s/%s", var.project, var.environment, var.application)
-}
-
-data "aws_secretsmanager_secret_version" "valheim-server-secret-version" {
-  secret_id = data.aws_secretsmanager_secret.valheim-server-secret.id
-}
-
-
-################# Secrets Manager #################
 
 ####################### EC2 #######################
 
@@ -111,22 +134,32 @@ data "aws_ami" "awslinux2" {
 ####################### VPC #######################
 data "aws_vpc" "selected" {
   filter {
-      name = "tag:Name"
-      values = [
-          format("%s-%s-vpc", var.environment, var.vpc_name)
-      ]
+    name = "tag:Name"
+    values = [
+      format("%s-%s-vpc", var.environment, var.vpc_name)
+    ]
   }
 }
 
 
-data "aws_subnet" "selected" {
-    filter {
-        name = "tag:Name"
-        values = [
-            format("%s-%s-public-subnet", var.environment, var.vpc_name)
-        ]
-    }
+data "aws_subnet" "public_subnet" {
+  filter {
+    name = "tag:Name"
+    values = [
+      format("%s-%s-public-subnet", var.environment, var.vpc_name)
+    ]
+  }
 }
+
+data "aws_subnet" "private_subnet" {
+  filter {
+    name = "tag:Name"
+    values = [
+      format("%s-%s-private-subnet", var.environment, var.vpc_name)
+    ]
+  }
+}
+
 
 ####################### VPC #######################
 

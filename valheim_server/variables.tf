@@ -1,16 +1,16 @@
 variable "application" {
   default = ""
-  type = string
+  type    = string
 }
 
 variable "environment" {
   default = ""
-  type = string
+  type    = string
 }
 
 variable "project" {
   default = ""
-  type = string
+  type    = string
 }
 
 variable "instance_type" {
@@ -25,7 +25,7 @@ variable "key_name" {
 
 variable "vpc_name" {
   default = ""
-  type = string
+  type    = string
 }
 
 variable "my_cidr_blocks" {
@@ -40,35 +40,35 @@ variable "cidr_blocks" {
 
 variable "aws_region" {
   default = ""
-  type = string
+  type    = string
 }
 
 variable "account_id" {
-  type = string
+  type        = string
   description = "Account Id"
 }
 
 variable "max_size" {
   default = 0
-  type = number
+  type    = number
 }
 
 variable "min_size" {
   default = 0
-  type = number
+  type    = number
 }
 
 variable "desired_capacity" {
   default = 0
-  type = number
+  type    = number
 }
 
 variable "bucket" {
   default = ""
-  type = string
+  type    = string
 }
 
 variable "world" {
   default = ""
-  type = string
+  type    = string
 }
