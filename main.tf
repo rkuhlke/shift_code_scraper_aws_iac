@@ -53,26 +53,26 @@ module "ecs_hosted_valheim_server" {
   world            = var.valheim_server_world
 }
 
-# output "template" {
-#   value = module.ecs_hosted_valheim_server.template
-# }
+output "template" {
+  value = module.ecs_hosted_valheim_server.template
+}
 #################### Valheim Server ####################
 
 ################## Discord Runner ASG ##################
-module "discord_runner_asg" {
-  source         = "./discord_bot_runner"
-  environment    = var.environment
-  project        = var.dr_project
-  application    = var.dr_application
-  min_size       = var.dr_min_size
-  max_size       = var.dr_max_size
-  key_name       = var.dr_key_name
-  instance_type  = var.dr_instance_type
-  vpc_name       = var.vpc_name
-  my_cidr_blocks = var.my_cidr_blocks
-  aws_region     = data.aws_region.current.name
-}
-output "template" {
-  value = module.discord_runner_asg.template
-}
+# module "discord_runner_asg" {
+#   source         = "./discord_bot_runner"
+#   environment    = var.environment
+#   project        = var.dr_project
+#   application    = var.dr_application
+#   min_size       = var.dr_min_size
+#   max_size       = var.dr_max_size
+#   key_name       = var.dr_key_name
+#   instance_type  = var.dr_instance_type
+#   vpc_name       = var.vpc_name
+#   my_cidr_blocks = var.my_cidr_blocks
+#   aws_region     = data.aws_region.current.name
+# }
+# output "template" {
+#   value = module.discord_runner_asg.template
+# }
 ################## Discord Runner ASG ##################
