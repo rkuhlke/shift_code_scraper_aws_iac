@@ -1,5 +1,5 @@
-resource "aws_launch_template" "ec2-launch-template" {
-  name                   = format("%s-%s-%s-ec2-launch-template", var.application, var.environment, var.project)
+resource "aws_launch_template" "launch_template" {
+  name                   = format("%s-%s-%s-ec2-launch-template", var.project, var.environment, var.application)
   description            = "Launch template for aws ec2"
   image_id               = data.aws_ami.awslinux2.id
   instance_type          = var.instance_type
@@ -50,12 +50,12 @@ resource "aws_autoscaling_group" "asg" {
   suspended_processes = ["ReplaceUnhealthy"]
 
   launch_template {
-    id = aws_launch_template.ec2-launch-template.id
+    id = aws_launch_template.launch_template.id
   }
 
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
+  lifecycle {
+    create_before_destroy = true
+  }
 
   tag {
     key                 = "Name"

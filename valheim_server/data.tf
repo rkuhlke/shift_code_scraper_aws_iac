@@ -11,9 +11,9 @@ data "aws_iam_policy_document" "iam-policy" {
       "secretsmanager:ListSecrets"
     ]
     resources = [
-      aws_secretsmanager_secret.server.arn,
-      aws_secretsmanager_secret.world.arn,
-      aws_secretsmanager_secret.password.arn
+      data.aws_secretsmanager_secret.server.arn,
+      data.aws_secretsmanager_secret.world.arn,
+      data.aws_secretsmanager_secret.password.arn
     ]
   }
   statement {
@@ -36,6 +36,8 @@ data "aws_iam_policy_document" "iam-policy" {
     sid = "S3Access"
     actions = [
       "s3:GetObject",
+      "s3:PutObject",
+      "s3:CreateMultiPartUpload",
       "s3:List*"
     ]
     resources = [
@@ -97,9 +99,9 @@ data "aws_iam_policy_document" "ecs_policy" {
     ]
 
     resources = [
-      aws_secretsmanager_secret.server.arn,
-      aws_secretsmanager_secret.world.arn,
-      aws_secretsmanager_secret.password.arn
+      data.aws_secretsmanager_secret.server.arn,
+      data.aws_secretsmanager_secret.world.arn,
+      data.aws_secretsmanager_secret.password.arn
     ]
   }
 
@@ -163,3 +165,17 @@ data "aws_subnet" "private_subnet" {
 
 ####################### VPC #######################
 
+################ Secrets Manager ##################
+data "aws_secretsmanager_secret" "world" {
+  name = "valheim-world-name"
+}
+
+data "aws_secretsmanager_secret" "password" {
+  name = "valheim-server-password"
+}
+
+data "aws_secretsmanager_secret" "server" {
+  name = "valheim-server-name"
+}
+
+################ Secrets Manager ##################

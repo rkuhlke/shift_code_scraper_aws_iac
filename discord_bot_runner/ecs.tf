@@ -28,12 +28,12 @@ resource "aws_ecs_capacity_provider" "capacity-provider" {
 
 resource "aws_ecs_task_definition" "task_definition" {
   depends_on = [
-    aws_ecr_repository.ecr_repo,
-    aws_iam_role.ecs_task_execution_role
+    aws_ecr_repository.ecr_repo
+    # aws_iam_role.ecs_task_execution_role
   ]
   family             = format("%s-%s-%s-task", var.project, var.environment, var.application)
   task_role_arn      = aws_iam_role.ecs_task_role.arn
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  # execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
 
   volume {
     name      = "hostVolume"
@@ -51,20 +51,6 @@ resource "aws_ecs_task_definition" "task_definition" {
         {
           "containerPath" : "/home/valheim/worlds",
           "sourceVolume" : "hostVolume"
-        }
-      ],
-      secrets = [
-        {
-          name      = "serverName"
-          valueFrom = "${data.aws_secretsmanager_secret.server.arn}"
-        },
-        {
-          name      = "worldName"
-          valueFrom = "${data.aws_secretsmanager_secret.world.arn}"
-        },
-        {
-          name      = "serverPassword"
-          valueFrom = "${data.aws_secretsmanager_secret.password.arn}"
         }
       ]
 

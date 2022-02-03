@@ -15,8 +15,8 @@ resource "aws_s3_bucket_policy" "valheim-server-get-policy" {
         }
         Action = [
           "s3:GetObject",
+          "s3:PutObject",
           "s3:List*"
-
         ]
         Resource = [
           data.aws_s3_bucket.selected.arn,

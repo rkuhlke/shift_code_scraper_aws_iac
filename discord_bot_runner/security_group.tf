@@ -11,14 +11,6 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = var.my_cidr_blocks
   }
 
-  ingress {
-    description = "Allow Server Port from VPC"
-    from_port   = 2456
-    to_port     = 2456
-    protocol    = "udp"
-    cidr_blocks = var.cidr_blocks
-  }
-
   egress {
     from_port   = 0
     to_port     = 0

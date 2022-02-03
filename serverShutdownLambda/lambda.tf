@@ -1,0 +1,18 @@
+resource "aws_lambda_function" "lambda_function" {
+  function_name = format("%s-%s-%s-lambda", var.environment, var.project, var.application)
+
+  environment {
+    variables = {
+      SERVER_NAME = var.server_name
+    }
+  }
+
+  role         = aws_iam_role.lambda_role.arn
+  timeout      = 300
+  image_uri    = "${aws_ecr_repository.ecr_repository.repository_url}:latest"
+  package_type = "Image"
+}
+
+resource "aws_cloudwatch_log_group" "lambda_log_group" {
+  name = "/aws/lambda/${aws_lambda_function.lambda_function.function_name}"
+}

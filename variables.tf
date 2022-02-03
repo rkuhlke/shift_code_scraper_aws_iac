@@ -58,12 +58,12 @@ variable "valheim_project" {
   default = ""
 }
 
-variable "instance_type" {
+variable "valheim_server_instance_type" {
   type        = string
   description = "AWS EC2 instance type"
 }
 
-variable "key_name" {
+variable "valheim_server_key_name" {
   type        = string
   description = "name of key to log into ec2 instance"
 }
@@ -88,29 +88,56 @@ variable "aws_region" {
   type    = string
 }
 
-variable "max_size" {
+variable "valheim_server_max_size" {
   default = 0
   type    = number
 }
 
-variable "min_size" {
+variable "valheim_server_min_size" {
   default = 0
   type    = number
 }
 
-variable "desired_capacity" {
+variable "valheim_server_desired_capacity" {
   default = 0
   type    = number
 }
 
-variable "bucket" {
+variable "valheim_server_bucket" {
   default = ""
   type    = string
 }
 
-variable "world" {
+variable "valheim_server_world" {
   default = ""
   type    = string
 }
 
 ########################### Valheim Server ###########################
+
+########################### Discord Runner ###########################
+variable "dr_instance_type" {
+
+}
+
+variable "dr_project" {
+  type = string
+}
+
+variable "dr_application" {
+  type = string
+}
+
+variable "dr_min_size" {
+  type = number
+}
+
+variable "dr_max_size" {
+  type = number
+}
+
+variable "dr_key_name" {
+
+}
+
+########################### Discord Runner ###########################
