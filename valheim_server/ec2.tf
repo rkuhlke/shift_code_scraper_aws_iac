@@ -15,6 +15,15 @@ resource "aws_launch_template" "ec2-launch-template" {
     arn = aws_iam_instance_profile.instance_profile.arn
   }
 
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = 8
+      volume_type = "gp3"
+      encrypted   = true
+    }
+  }
+
   tags = {
     Name        = format("%s-%s-%s-ec2-launch-template", var.project, var.environment, var.application)
     Builder     = "Terraform"
