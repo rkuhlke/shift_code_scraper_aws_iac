@@ -43,13 +43,13 @@ resource "aws_ecs_task_definition" "task_definition" {
     {
       name         = "${var.application}"
       image        = "${data.aws_ecr_repository.ecr_repo.repository_url}:latest"
-      cpu          = 2048
+      cpu          = 4096
       memory       = 8192
       essential    = true
       network_mode = "host"
       mountPoints = [
         {
-          "containerPath" : "/home/valheim/worlds",
+          "containerPath" : "/root/.config/unity3d/IronGate/Valheim/worlds_local",
           "sourceVolume" : "hostVolume"
         }
       ],
